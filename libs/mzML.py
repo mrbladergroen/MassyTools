@@ -257,7 +257,7 @@ class parseMZML():
 
         # check path
         if not os.path.exists(path):
-            raise IOError, 'File not found! --> ' + self.path
+            raise IOError('File not found! --> ' + self.path)
 
     def load(self):
         """ Load all scans into memory.
@@ -269,9 +269,7 @@ class parseMZML():
 
         # parse document
         try:
-            document = file(self.path)
-            parser.parse(document)
-            document.close()
+            parser.parse(self.path)
             self._scans = handler.data
         except xml.sax.SAXException:
             self._scans = False
@@ -315,9 +313,9 @@ class parseMZML():
             intPrecision = 'd'
         
         # convert from binary
-        count = len(mzData) / struct.calcsize('<' + mzPrecision)
+        count = len(mzData) // struct.calcsize('<' + mzPrecision)
         mzData = struct.unpack('<' + mzPrecision * count, mzData[0:len(mzData)])
-        count = len(intData) / struct.calcsize('<' + intPrecision)
+        count = len(intData) // struct.calcsize('<' + intPrecision)
         intData = struct.unpack('<' + intPrecision * count, intData[0:len(intData)])
         
         # format

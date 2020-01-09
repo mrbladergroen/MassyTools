@@ -16,10 +16,10 @@
 # http://www.apache.org/licenses/LICENSE-2.0
 
 from datetime import datetime
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy.optimize import fmin
-from Tkinter import *
+import tkinter as tk
 import fileinput
 import glob
 import itertools
@@ -29,20 +29,20 @@ import matplotlib
 import os
 import numpy
 import sys
-import tkFileDialog
-import tkMessageBox
-import ttk
+import tkinter.filedialog as filedialog
+import tkinter.messagebox as messagebox
+import tkinter.ttk as ttk
 
 # Custom libraries
-sys.path.append('libs')
-import mzML
-import xy
-import varnames
+#sys.path.append('libs')
+import libs.mzML as mzML
+import libs.xy as xy
+import libs.varnames as varnames
 
 # Function overwrites
 def dynamic_update(foo):
     pass
-matplotlib.backends.backend_tkagg.NavigationToolbar2TkAgg.dynamic_update = dynamic_update
+matplotlib.backends.backend_tkagg.NavigationToolbar2Tk.dynamic_update = dynamic_update
 
 # File
 TYPES = ("*.xy","*.mzML")                               # File types that will be used by MassyTools
@@ -128,9 +128,9 @@ for k,v in BLOCKS.items():
         if v['available_for_mass_modifiers'] not in [0,1]:
             raise TypeError('Mass modifier is not 0 or 1.')
     except:
-        root = Tk()
+        root = tk.Tk()
         root.withdraw()
-        tkMessageBox.showinfo("Block Error","An error was observed in block "+str(k)+
+        messagebox.showinfo("Block Error","An error was observed in block "+str(k)+
             ". Please correct this block before running LaCyTools again.")
         sys.exit()
 UNITS = BLOCKS.keys()
@@ -214,7 +214,7 @@ class ToolTip(object):
         x, y, cx, cy = self.widget.bbox("insert")
         x = x + self.widget.winfo_rootx() + 27
         y = y + cy + self.widget.winfo_rooty() +27
-        self.tipwindow = tw = Toplevel(self.widget)
+        self.tipwindow = tw = tk.Toplevel(self.widget)
         tw.wm_overrideredirect(1)
         tw.wm_geometry("+%d+%d" % (x, y))
         try:
@@ -222,10 +222,10 @@ class ToolTip(object):
             tw.tk.call("::tk::unsupported::MacWindowStyle",
                        "style", tw._w,
                        "help", "noActivates")
-        except TclError:
+        except tk.TclError:
             pass
-        label = Label(tw, text=self.text, justify=LEFT,
-                      background="#ffffe0", relief=SOLID, borderwidth=1,
+        label = tk.Label(tw, text=self.text, justify=tk.LEFT,
+                      background="#ffffe0", relief=tk.SOLID, borderwidth=1,
                       wraplength=500, font=("tahoma", "8", "normal"))
         label.pack(ipadx=1)
 
@@ -254,15 +254,15 @@ class App():
         self.version = "1.0.2"
         self.build = "190321a"
         self.master = master
-        self.absoluteIntensity = IntVar()
-        self.relativeIntensity = IntVar()
-        self.bckSub = IntVar()
-        self.valueIso = IntVar()
-        self.bckNoise = IntVar()
-        self.riCor = IntVar()
-        self.sQC = IntVar()
-        self.aQC = IntVar()
-        self.overWrite = IntVar(value=1)
+        self.absoluteIntensity = tk.IntVar()
+        self.relativeIntensity = tk.IntVar()
+        self.bckSub = tk.IntVar()
+        self.valueIso = tk.IntVar()
+        self.bckNoise = tk.IntVar()
+        self.riCor = tk.IntVar()
+        self.sQC = tk.IntVar()
+        self.aQC = tk.IntVar()
+        self.overWrite = tk.IntVar(value=1)
         self.batchProcessing = 0
         self.batchWindow = 0
         self.measurementWindow = 0
@@ -295,53 +295,53 @@ class App():
             background_image.imshow(image)
         # The Canvas
         self.canvas = FigureCanvasTkAgg(self.fig, master=master)
-        self.toolbar = NavigationToolbar2TkAgg(self.canvas, master)
-        self.canvas.get_tk_widget().pack(fill=BOTH, expand=YES)
+        self.toolbar = NavigationToolbar2Tk(self.canvas, master)
+        self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         self.canvas.draw()
 
         # FRAME
-        frame = Frame(master)
+        frame = tk.Frame(master)
         master.title("MassyTools "+str(self.version))
-        if os.path.isfile('./ui/Icon.ico'):
-            master.iconbitmap(default='./ui/Icon.ico')
+#       if os.path.isfile('./ui/Icon.ico'):
+#           master.iconbitmap(default='./ui/Icon.ico')
 
         # VARIABLE ENTRIES
 
         # BUTTONS
 
         # MENU
-        menu = Menu(master)
+        menu = tk.Menu(master)
         master.config(menu=menu)
 
-        filemenu = Menu(menu, tearoff=0)
+        filemenu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="File", menu=filemenu)
         filemenu.add_command(label="Open Input File", command=self.openFile)
 
-        calibmenu = Menu(menu, tearoff=0)
+        calibmenu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Calibrate", menu=calibmenu)
         calibmenu.add_command(label="Open Calibration File", command=self.openCalibrationFile)
         calibmenu.add_command(label="Open Exclusion File", command=self.openExclusionFile)
         calibmenu.add_command(label="Calibrate", command=self.calibrateData)
 
-        extractionmenu = Menu(menu, tearoff=0)
+        extractionmenu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Extraction", menu=extractionmenu)
         extractionmenu.add_command(label="Open Composition File", command=self.openCompositionFile)
         extractionmenu.add_command(label="Extract", command=self.extractCompositions)
 
-        qualitymenu = Menu(menu, tearoff=0)
+        qualitymenu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="QC", menu=qualitymenu)
         qualitymenu.add_command(label="Open Quality Control File", command=self.openQualityFile)
         qualitymenu.add_command(label="Calculate QC", command=self.singularQualityControl)
 
         menu.add_command(label="Batch Process", command=lambda: self.batchPopup(self))
 
-        curationmenu = Menu(menu, tearoff=0)
+        curationmenu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Data Curation", menu=curationmenu)
         curationmenu.add_command(label="Spectral Curation", command=lambda: self.spectralCuration(self))
         curationmenu.add_command(label="Analyte Curation", command=lambda: self.analyteCuration(self))
 
         menu.add_command(label="Settings", command = lambda: self.settingsPopup(self))
-        
+
         menu.add_command(label="About MassyTools", command=lambda: self.infoPopup())
 
     # Correctify these for MassyTools
@@ -400,66 +400,66 @@ class App():
                 fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.extracMinTotal.get()))+"\n")
 
         master.measurementWindow = 1
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
-        self.calibrationLabel = Label(top, text="Calibration parameters", font="bold")
-        self.calibrationLabel.grid(row=1, columnspan=2, sticky=W)
-        self.calibWindowLabel = Label(top, text="m/z window for calibration")
-        self.calibWindowLabel.grid(row=2, column=0, sticky=W)
-        self.calibWindow = Entry(top)
+        self.calibrationLabel = tk.Label(top, text="Calibration parameters", font="bold")
+        self.calibrationLabel.grid(row=1, columnspan=2, sticky=tk.W)
+        self.calibWindowLabel = tk.Label(top, text="m/z window for calibration")
+        self.calibWindowLabel.grid(row=2, column=0, sticky=tk.W)
+        self.calibWindow = tk.Entry(top)
         self.calibWindow.insert(0, CALIBRATION_WINDOW)
-        self.calibWindow.grid(row=2, column=1, sticky=W)
-        self.calibSnLabel = Label(top, text="Minimal S/N for calibration")
-        self.calibSnLabel.grid(row=3, column=0, sticky=W)
-        self.calibSn = Entry(top)
+        self.calibWindow.grid(row=2, column=1, sticky=tk.W)
+        self.calibSnLabel = tk.Label(top, text="Minimal S/N for calibration")
+        self.calibSnLabel.grid(row=3, column=0, sticky=tk.W)
+        self.calibSn = tk.Entry(top)
         self.calibSn.insert(0, CALIB_S_N_CUTOFF)
-        self.calibSn.grid(row=3, column=1, sticky=W)
-        self.calibMinLowLabel = Label(top, text="Minimal number of calibrants in low m/z range")
-        self.calibMinLowLabel.grid(row=4, column=0, sticky=W)
-        self.calibMinLow = Entry(top)
+        self.calibSn.grid(row=3, column=1, sticky=tk.W)
+        self.calibMinLowLabel = tk.Label(top, text="Minimal number of calibrants in low m/z range")
+        self.calibMinLowLabel.grid(row=4, column=0, sticky=tk.W)
+        self.calibMinLow = tk.Entry(top)
         self.calibMinLow.insert(0, NUM_LOW_RANGE)
-        self.calibMinLow.grid(row=4, column=1, sticky=W)
-        self.calibMinMidLabel = Label(top, text="Minimal number of calibrants in medium m/z range")
-        self.calibMinMidLabel.grid(row=5, column=0, sticky=W)
-        self.calibMinMid = Entry(top)
+        self.calibMinLow.grid(row=4, column=1, sticky=tk.W)
+        self.calibMinMidLabel = tk.Label(top, text="Minimal number of calibrants in medium m/z range")
+        self.calibMinMidLabel.grid(row=5, column=0, sticky=tk.W)
+        self.calibMinMid = tk.Entry(top)
         self.calibMinMid.insert(0, NUM_MID_RANGE)
-        self.calibMinMid.grid(row=5, column=1, sticky=W)
-        self.calibMinHighLabel = Label(top, text="Minimal number of calibrants in high m/z range")
-        self.calibMinHighLabel.grid(row=6, column=0, sticky=W)
-        self.calibMinHigh = Entry(top)
+        self.calibMinMid.grid(row=5, column=1, sticky=tk.W)
+        self.calibMinHighLabel = tk.Label(top, text="Minimal number of calibrants in high m/z range")
+        self.calibMinHighLabel.grid(row=6, column=0, sticky=tk.W)
+        self.calibMinHigh = tk.Entry(top)
         self.calibMinHigh.insert(0, NUM_HIGH_RANGE)
-        self.calibMinHigh.grid(row=6, column=1, sticky=W)
-        self.calibMinTotalLabel = Label(top, text="Minimal number of calibrants")
-        self.calibMinTotalLabel.grid(row=7, column=0, sticky=W)
-        self.calibMinTotal = Entry(top)
+        self.calibMinHigh.grid(row=6, column=1, sticky=tk.W)
+        self.calibMinTotalLabel = tk.Label(top, text="Minimal number of calibrants")
+        self.calibMinTotalLabel.grid(row=7, column=0, sticky=tk.W)
+        self.calibMinTotal = tk.Entry(top)
         self.calibMinTotal.insert(0, NUM_TOTAL)
-        self.calibMinTotal.grid(row=7, column=1, sticky=W)
-        self.extractionLabel = Label(top, text="Extraction & QC Parameters", font="bold")
-        self.extractionLabel.grid(row=8, columnspan=2, sticky=W)
-        self.extracMassWindowLabel = Label(top, text="m/z window for quantitation")
-        self.extracMassWindowLabel.grid(row=9, column=0, sticky=W)
-        self.extracMassWindow = Entry(top)
+        self.calibMinTotal.grid(row=7, column=1, sticky=tk.W)
+        self.extractionLabel = tk.Label(top, text="Extraction & QC Parameters", font="bold")
+        self.extractionLabel.grid(row=8, columnspan=2, sticky=tk.W)
+        self.extracMassWindowLabel = tk.Label(top, text="m/z window for quantitation")
+        self.extracMassWindowLabel.grid(row=9, column=0, sticky=tk.W)
+        self.extracMassWindow = tk.Entry(top)
         self.extracMassWindow.insert(0, CALCULATION_WINDOW)
-        self.extracMassWindow.grid(row=9, column=1, sticky=W)
-        self.extracMinTotalLabel = Label(top, text="Minimum isotopic fraction")
-        self.extracMinTotalLabel.grid(row=10, column=0, sticky=W)
-        self.extracMinTotal = Entry(top)
+        self.extracMassWindow.grid(row=9, column=1, sticky=tk.W)
+        self.extracMinTotalLabel = tk.Label(top, text="Minimum isotopic fraction")
+        self.extracMinTotalLabel.grid(row=10, column=0, sticky=tk.W)
+        self.extracMinTotal = tk.Entry(top)
         self.extracMinTotal.insert(0, MIN_TOTAL_CONTRIBUTION)
-        self.extracMinTotal.grid(row=10, column=1, sticky=W)
-        self.extracBackLabel = Label(top, text="Background detection window")
-        self.extracBackLabel.grid(row=11, column=0, sticky=W)
-        self.extracBack = Entry(top)
+        self.extracMinTotal.grid(row=10, column=1, sticky=tk.W)
+        self.extracBackLabel = tk.Label(top, text="Background detection window")
+        self.extracBackLabel.grid(row=11, column=0, sticky=tk.W)
+        self.extracBack = tk.Entry(top)
         self.extracBack.insert(0, OUTER_BCK_BORDER)
-        self.extracBack.grid(row=11, column=1, sticky=W)
-        self.extracQcSnLabel = Label(top, text="S/N cutoff for spectral QC")
-        self.extracQcSnLabel.grid(row=12, column=0, sticky=W)
-        self.extracQcSn = Entry(top)
+        self.extracBack.grid(row=11, column=1, sticky=tk.W)
+        self.extracQcSnLabel = tk.Label(top, text="S/N cutoff for spectral QC")
+        self.extracQcSnLabel.grid(row=12, column=0, sticky=tk.W)
+        self.extracQcSn = tk.Entry(top)
         self.extracQcSn.insert(0, S_N_CUTOFF)
-        self.extracQcSn.grid(row=12, column=1, sticky=W)
-        self.ok = Button(top,text = 'Ok', command = lambda: close(self))
-        self.ok.grid(row = 13, column = 0, sticky = W)
-        self.save = Button(top, text = 'Save', command = lambda: save(self))
-        self.save.grid(row = 13, column = 1, sticky = E)
+        self.extracQcSn.grid(row=12, column=1, sticky=tk.W)
+        self.ok = tk.Button(top,text = 'Ok', command = lambda: close(self))
+        self.ok.grid(row = 13, column = 0, sticky=tk.W)
+        self.save = tk.Button(top, text = 'Save', command = lambda: save(self))
+        self.save.grid(row = 13, column = 1, sticky=tk.E)
         # Tooltips
         createToolTip(self.calibWindowLabel,"The mass window in Dalton around the specified exact m/z of a calibrant, that LaCyTools uses to determine the uncalibrated accurate mass.")
         createToolTip(self.calibSnLabel,"The minimum S/N of a calibrant to be included in the calibration.")
@@ -522,7 +522,7 @@ class App():
 
                     
     def infoPopup(self):
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         information = ("MassyTools Version "+str(self.version)+"\n\n"
                        "Written by Bas Jansen, bas.c.jansen@gmail.com\n"
                        "Art by Rosina Plomp, h.r.plomp@lumc.nl\n\n"
@@ -536,7 +536,7 @@ class App():
                        "Full details regarding this license can be found at\n"
                        "the following URL:\n\n"
                        "http://www.apache.org/licenses/LICENSE-2.0")
-        self.about = Label(top, text=information, justify=LEFT)
+        self.about = tk.Label(top, text=information, justify=tk.LEFT)
         self.about.pack()
         top.lift()
 
@@ -554,10 +554,10 @@ class App():
         if master.batchWindow == 1:
             return
         master.batchWindow = 1
-        self.calFile = StringVar()
-        self.exclFile = StringVar()
-        self.compFile = StringVar()
-        self.folder = StringVar()
+        self.calFile = tk.StringVar()
+        self.exclFile = tk.StringVar()
+        self.compFile = tk.StringVar()
+        self.folder = tk.StringVar()
 
         def calibrationButton():
             master.openCalibrationFile()
@@ -584,31 +584,31 @@ class App():
             top.destroy()
             master.batchProcess(master)
 
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
-        self.calib = Button(top, text="Calibration File", width=25, command=lambda: calibrationButton())
-        self.calib.grid(row=0, column=0, sticky=W)
-        self.cal = Label(top, textvariable=self.calFile, width=25)
+        self.calib = tk.Button(top, text="Calibration File", width=25, command=lambda: calibrationButton())
+        self.calib.grid(row=0, column=0, sticky=tk.W)
+        self.cal = tk.Label(top, textvariable=self.calFile, width=25)
         self.cal.grid(row=0, column=1, padx=25)
-        self.exclus = Button(top, text="Exclusion File", width=25, command=lambda: exclusionButton())
-        self.exclus.grid(row=1, column=0, sticky=W)
-        self.exc = Label(top, textvariable=self.exclFile, width=25)
+        self.exclus = tk.Button(top, text="Exclusion File", width=25, command=lambda: exclusionButton())
+        self.exclus.grid(row=1, column=0, sticky=tk.W)
+        self.exc = tk.Label(top, textvariable=self.exclFile, width=25)
         self.exc.grid(row=1, column=1)
-        self.compos = Button(top, text="Composition File", width=25, command=lambda: compositionButton())
-        self.compos.grid(row=2, column=0, sticky=W)
-        self.com = Label(top, textvariable=self.compFile, width=25)
+        self.compos = tk.Button(top, text="Composition File", width=25, command=lambda: compositionButton())
+        self.compos.grid(row=2, column=0, sticky=tk.W)
+        self.com = tk.Label(top, textvariable=self.compFile, width=25)
         self.com.grid(row=2, column=1)
-        self.overwrite = Checkbutton(top, text = "Overwrite Analyte File", variable = master.overWrite, onvalue = 1, offvalue = 0)
-        self.overwrite.grid(row = 3, column = 0, sticky = W)
-        self.batchDir = Button(top, text="Batch Directory", width=25, command=lambda: batchButton())
-        self.batchDir.grid(row=4, column=0, sticky=W)
-        self.batch = Label(top, textvariable=self.folder, width=25)
+        self.overwrite = tk.Checkbutton(top, text = "Overwrite Analyte File", variable = master.overWrite, onvalue = 1, offvalue = 0)
+        self.overwrite.grid(row = 3, column = 0, sticky=tk.W)
+        self.batchDir = tk.Button(top, text="Batch Directory", width=25, command=lambda: batchButton())
+        self.batchDir.grid(row=4, column=0, sticky=tk.W)
+        self.batch = tk.Label(top, textvariable=self.folder, width=25)
         self.batch.grid(row=4, column=1)
-        self.measurement = Button(top, text="Measurement Setup", width=25, command=lambda: master.measurementPopup(master))
+        self.measurement = tk.Button(top, text="Measurement Setup", width=25, command=lambda: master.measurementPopup(master))
         self.measurement.grid(row=5, column=0,columnspan=2)
-        self.output = Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
+        self.output = tk.Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
         self.output.grid(row=6, column=0, columnspan=2)
-        self.run = Button(top, text="Run Batch Process", width=25, command=lambda: run())
+        self.run = tk.Button(top, text="Run Batch Process", width=25, command=lambda: run())
         self.run.grid(row=7, column=0, columnspan=2)
         # top.lift()
         # Couple the attributes to button presses
@@ -623,14 +623,14 @@ class App():
         OUTPUT: None
         """
         options = []
-        self.chargeCarrierVar = StringVar()
+        self.chargeCarrierVar = tk.StringVar()
         self.chargeCarrierVar.set(CHARGE_CARRIER[0])
 
         def onselect1(evt):
             w = evt.widget
             index = int(w.curselection()[0])
             value = w.get(index)
-            master.selected.insert(END,value)
+            master.selected.insert(tk.END,value)
             master.avail.delete(index)
 
         def onselect2(evt):
@@ -638,13 +638,13 @@ class App():
             index = int(w.curselection()[0])
             value = w.get(index)
             master.selected.delete(index)
-            master.avail.insert(END,value)
+            master.avail.insert(tk.END,value)
 
         def close(self):
             global MASS_MODIFIERS           # Evil... I know
             global CHARGE_CARRIER           # Ditto
             MASS_MODIFIERS = []
-            values = master.selected.get(0, END)
+            values = master.selected.get(0, tk.END)
             for i in values:
                 for j in UNITS:
                     if str(i) == BLOCKS[j]['human_readable_name'] and BLOCKS[j]['available_for_mass_modifiers']:
@@ -660,7 +660,7 @@ class App():
             global MASS_MODIFIERS           # Evil... I know
             global CHARGE_CARRIER           # Ditto
             MASS_MODIFIERS = []
-            values = master.selected.get(0, END)
+            values = master.selected.get(0, tk.END)
             for i in values:
                 for j in UNITS:
                     if str(i) == BLOCKS[j]['human_readable_name'] and BLOCKS[j]['available_for_mass_modifiers']:
@@ -689,46 +689,46 @@ class App():
             return
 
         master.measurementWindow = 1
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
-        self.charge = Label(top, text = "Charge", width = 10)
-        self.charge.grid(row = 0, column = 0, sticky = W)
-        self.min = Label(top, text = "Min", width = 5)
-        self.min.grid(row=0, column = 1, sticky = W)
-        self.minCharge = Spinbox(top, from_= 1, to = 3, width = 5)
-        self.minCharge.grid(row = 0, column = 2, sticky = W)
-        self.max = Label(top, text = "Max", width = 5)
-        self.max.grid(row = 0, column = 3, sticky = W)
-        self.maxCharge = Spinbox(top, from_ = 1, to=3, width=5)
-        self.maxCharge.grid(row = 0, column = 4, sticky = W)
+        self.charge = tk.Label(top, text = "Charge", width = 10)
+        self.charge.grid(row = 0, column = 0, sticky=tk.W)
+        self.min = tk.Label(top, text = "Min", width = 5)
+        self.min.grid(row=0, column = 1, sticky=tk.W)
+        self.minCharge = tk.Spinbox(top, from_= 1, to = 3, width = 5)
+        self.minCharge.grid(row = 0, column = 2, sticky=tk.W)
+        self.max = tk.Label(top, text = "Max", width = 5)
+        self.max.grid(row = 0, column = 3, sticky=tk.W)
+        self.maxCharge = tk.Spinbox(top, from_ = 1, to=3, width=5)
+        self.maxCharge.grid(row = 0, column = 4, sticky=tk.W)
         # Construct charge carrier option menu
         for i in UNITS:
             if BLOCKS[i]['available_for_charge_carrier'] == 1:
                 options.append(i)
-        self.chargeCarrier = OptionMenu(top, self.chargeCarrierVar, *options)
-        self.chargeCarrier.grid(row = 0, column = 5, sticky = W)
-        self.availMass = Label(top, text = "Available")
-        self.availMass.grid(row = 1, column = 1, sticky = W)
-        self.selectMass = Label(top, text = "Selected")
-        self.selectMass.grid(row = 1, column = 3, sticky = W)
-        self.massMod = Label(top, text = "Mass Mods")
-        self.massMod.grid(row = 2, column = 0, sticky = W)
-        self.avail = Listbox(top)
-        self.avail.grid(row = 2, column = 1, columnspan = 2, sticky = W)
+        self.chargeCarrier = tk.OptionMenu(top, self.chargeCarrierVar, *options)
+        self.chargeCarrier.grid(row = 0, column = 5, sticky=tk.W)
+        self.availMass = tk.Label(top, text = "Available")
+        self.availMass.grid(row = 1, column = 1, sticky=tk.W)
+        self.selectMass = tk.Label(top, text = "Selected")
+        self.selectMass.grid(row = 1, column = 3, sticky=tk.W)
+        self.massMod = tk.Label(top, text = "Mass Mods")
+        self.massMod.grid(row = 2, column = 0, sticky=tk.W)
+        self.avail = tk.Listbox(top)
+        self.avail.grid(row = 2, column = 1, columnspan = 2, sticky=tk.W)
         self.avail.bind('<<ListboxSelect>>',onselect1)
-        self.selected = Listbox(top)
-        self.selected.grid(row = 2, column = 3, columnspan = 2, sticky = W)
+        self.selected = tk.Listbox(top)
+        self.selected.grid(row = 2, column = 3, columnspan = 2, sticky=tk.W)
         self.selected.bind('<<ListboxSelect>>',onselect2)
         # Construct mass modifier list box
         for i in UNITS:
             if i in MASS_MODIFIERS:
-                self.selected.insert(END,BLOCKS[i]['human_readable_name'])
+                self.selected.insert(tk.END,BLOCKS[i]['human_readable_name'])
             elif BLOCKS[i]['available_for_mass_modifiers'] == 1:
-                self.avail.insert(END,BLOCKS[i]['human_readable_name'])
-        self.ok = Button(top,text = 'Ok', command = lambda: close(self))
-        self.ok.grid(row = 3, column = 0, sticky = W)
-        self.save = Button(top, text = 'Save', command = lambda: save(self))
-        self.save.grid(row = 3, column = 5, sticky = E)
+                self.avail.insert(tk.END,BLOCKS[i]['human_readable_name'])
+        self.ok = tk.Button(top,text = 'Ok', command = lambda: close(self))
+        self.ok.grid(row = 3, column = 0, sticky=tk.W)
+        self.save = tk.Button(top, text = 'Save', command = lambda: save(self))
+        self.save.grid(row = 3, column = 5, sticky=tk.E)
 
     def outputPopup(self, master):
         """ This function creates a pop up box to specify what output
@@ -766,33 +766,33 @@ class App():
             master.outputWindow = 0
             top.destroy()
 
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
-        self.all = Button(top, text="Select All", command=lambda: select_all(self))
-        self.all.grid(row=0, column=0, sticky=W)
-        self.none = Button(top, text="Select None", command=lambda: select_none(self))
-        self.none.grid(row=0, column=1, sticky=E)
-        self.text1 = Label(top, text="Base Outputs", font="bold")
-        self.text1.grid(row=1, column=0, sticky=W)
-        self.text2 = Label(top, text="Output Modifiers", font="bold")
-        self.text2.grid(row=1, column=1, sticky=W)
-        self.ai = Checkbutton(top, text=u"Analyte Intensity\u00B9\u00B7\u00B2", variable=master.absoluteIntensity, onvalue=1, offvalue=0)
-        self.ai.grid(row=2, column=0, sticky=W)
-        self.ri = Checkbutton(top, text=u"Relative Intensity\u00B9\u00B7\u00B3", variable=master.relativeIntensity, onvalue=1, offvalue=0)
-        self.ri.grid(row=3, column=0, sticky=W)
-        self.bck = Checkbutton(top, text=u"\u00B9Background subtracted Intensities", variable=master.bckSub, onvalue=1, offvalue=0)
-        self.bck.grid(row=2, column=1, sticky=W)
-        self.isotope = Checkbutton(top, text=u"\u00B2Values per Isotope", variable=master.valueIso, onvalue=1, offvalue=0)
-        self.isotope.grid(row=3, column=1, sticky=W)
-        self.backNoise = Checkbutton(top, text="Analyte Background & Noise", variable=master.bckNoise, onvalue=1, offvalue=0)
-        self.backNoise.grid(row=4, column=0, sticky=W)
-        self.ri_Cor = Checkbutton(top, text=u"\u00B3Corrected for Isotopic Pattern", variable=master.riCor, onvalue=1, offvalue=0)
-        self.ri_Cor.grid(row=4, column=1, sticky=W)
-        self.s_QC = Checkbutton(top, text=u"Spectral QC\u00B9", variable=master.sQC, onvalue=1, offvalue=0)
-        self.s_QC.grid(row=5, column=0, sticky=W)
-        self.a_QC = Checkbutton(top, text="Analyte QC", variable=master.aQC, onvalue=1, offvalue=0)
-        self.a_QC.grid(row=6, column=0, sticky=W)
-        self.button = Button(top,text='Ok',command = lambda: close(self))
+        self.all = tk.Button(top, text="Select All", command=lambda: select_all(self))
+        self.all.grid(row=0, column=0, sticky=tk.W)
+        self.none = tk.Button(top, text="Select None", command=lambda: select_none(self))
+        self.none.grid(row=0, column=1, sticky=tk.E)
+        self.text1 = tk.Label(top, text="Base Outputs", font="bold")
+        self.text1.grid(row=1, column=0, sticky=tk.W)
+        self.text2 = tk.Label(top, text="Output Modifiers", font="bold")
+        self.text2.grid(row=1, column=1, sticky=tk.W)
+        self.ai = tk.Checkbutton(top, text=u"Analyte Intensity\u00B9\u00B7\u00B2", variable=master.absoluteIntensity, onvalue=1, offvalue=0)
+        self.ai.grid(row=2, column=0, sticky=tk.W)
+        self.ri = tk.Checkbutton(top, text=u"Relative Intensity\u00B9\u00B7\u00B3", variable=master.relativeIntensity, onvalue=1, offvalue=0)
+        self.ri.grid(row=3, column=0, sticky=tk.W)
+        self.bck = tk.Checkbutton(top, text=u"\u00B9Background subtracted Intensities", variable=master.bckSub, onvalue=1, offvalue=0)
+        self.bck.grid(row=2, column=1, sticky=tk.W)
+        self.isotope = tk.Checkbutton(top, text=u"\u00B2Values per Isotope", variable=master.valueIso, onvalue=1, offvalue=0)
+        self.isotope.grid(row=3, column=1, sticky=tk.W)
+        self.backNoise = tk.Checkbutton(top, text="Analyte Background & Noise", variable=master.bckNoise, onvalue=1, offvalue=0)
+        self.backNoise.grid(row=4, column=0, sticky=tk.W)
+        self.ri_Cor = tk.Checkbutton(top, text=u"\u00B3Corrected for Isotopic Pattern", variable=master.riCor, onvalue=1, offvalue=0)
+        self.ri_Cor.grid(row=4, column=1, sticky=tk.W)
+        self.s_QC = tk.Checkbutton(top, text=u"Spectral QC\u00B9", variable=master.sQC, onvalue=1, offvalue=0)
+        self.s_QC.grid(row=5, column=0, sticky=tk.W)
+        self.a_QC = tk.Checkbutton(top, text="Analyte QC", variable=master.aQC, onvalue=1, offvalue=0)
+        self.a_QC.grid(row=6, column=0, sticky=tk.W)
+        self.button = tk.Button(top,text='Ok',command = lambda: close(self))
         self.button.grid(row = 7, column = 0, columnspan = 2)
         top.lift()
 
@@ -805,7 +805,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
@@ -826,7 +826,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
@@ -840,7 +840,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
@@ -854,12 +854,12 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
             setattr(self, 'exclusionFile', file_path)
-    
+
     def openSummaryFile(self):
         """ This function opens a Tkinter filedialog, asking the user
         to select a file. The chosen file is then set to the
@@ -868,7 +868,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
@@ -882,7 +882,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = tkFileDialog.askopenfilename()
+        file_path = filedialog.askopenfilename()
         if not file_path:
             pass
         else:
@@ -896,7 +896,7 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        folder_path = tkFileDialog.askdirectory()
+        folder_path = filedialog.askdirectory()
         if not folder_path:
             pass
         else:
@@ -909,9 +909,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        self.testVariable = StringVar()
-        self.criteriaVariable = StringVar()
-        self.sumFile = StringVar()
+        self.testVariable = tk.StringVar()
+        self.criteriaVariable = tk.StringVar()
+        self.sumFile = tk.StringVar()
         self.data = []
 
         def summaryButton():
@@ -923,7 +923,7 @@ class App():
             top.destroy()
 
         def refreshButton():
-            print self.testVariable.get()
+            print (self.testVariable.get())
 
         def initSummary(sumFile):
             chunk = []
@@ -966,9 +966,9 @@ class App():
                                 intermediate.append(numpy.median([float(k) for k in j[2:]]))
                         intermediates.append([i[0][0],intermediate])
             else:
-                tkMessageBox.showinfo("Error Message", "Required QC are not present in this summary file")
+                messagebox.showinfo("Error Message", "Required QC are not present in this summary file")
             # Write results
-            file_path = tkFileDialog.asksaveasfilename()
+            file_path = filedialog.asksaveasfilename()
             if file_path:
                 with open(file_path,'w') as fw:
                     fw.write("Curation")
@@ -1022,39 +1022,39 @@ class App():
                             fw.write("\n")
             top.destroy()
 
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
-        self.sumButtonLabel = Label(top, text="Please select the summary file to be curated")
-        self.sumButtonLabel.grid(row=0, column=0, sticky=W)
-        self.sumButton = Button(top, text="Summary File", width=25, command=lambda: summaryButton())
-        self.sumButton.grid(row=0, column=1, sticky=W)
-        #self.sumLabel = Label(top, textvariable=self.sumFile, width=25)
+        self.sumButtonLabel = tk.Label(top, text="Please select the summary file to be curated")
+        self.sumButtonLabel.grid(row=0, column=0, sticky=tk.W)
+        self.sumButton = tk.Button(top, text="Summary File", width=25, command=lambda: summaryButton())
+        self.sumButton.grid(row=0, column=1, sticky=tk.W)
+        #self.sumLabel = tk.Label(top, textvariable=self.sumFile, width=25)
         #self.sumLabel.grid(row=0, column=1, padx=25)
-        self.dataLabel = Label(top, text="Data to be curated")
-        self.dataLabel.grid(row=1, column=0, sticky=W)
-        self.dataButton = OptionMenu(top, self.testVariable, "Select a summary file first")
-        self.dataButton.grid(row=1, column=1, sticky=W)
-        self.criteriaLabel = Label(top, text="Please select whether to use mean or median for curation")
-        self.criteriaLabel.grid(row=2, column=0, sticky=W)
-        self.criteriaToggle = OptionMenu(top, self.criteriaVariable, "Mean","Median")
-        self.criteriaToggle.grid(row=2, column=1, sticky=W)
-        self.massAccLabel = Label(top, text="Enter the maximum mass accuracy error in PPM")
-        self.massAccLabel.grid(row=3, column=0, sticky=W)
-        self.massAccCutoff = Entry(top)
+        self.dataLabel = tk.Label(top, text="Data to be curated")
+        self.dataLabel.grid(row=1, column=0, sticky=tk.W)
+        self.dataButton = tk.OptionMenu(top, self.testVariable, "Select a summary file first")
+        self.dataButton.grid(row=1, column=1, sticky=tk.W)
+        self.criteriaLabel = tk.Label(top, text="Please select whether to use mean or median for curation")
+        self.criteriaLabel.grid(row=2, column=0, sticky=tk.W)
+        self.criteriaToggle = tk.OptionMenu(top, self.criteriaVariable, "Mean","Median")
+        self.criteriaToggle.grid(row=2, column=1, sticky=tk.W)
+        self.massAccLabel = tk.Label(top, text="Enter the maximum mass accuracy error in PPM")
+        self.massAccLabel.grid(row=3, column=0, sticky=tk.W)
+        self.massAccCutoff = tk.Entry(top)
         self.massAccCutoff.insert(0,20)
-        self.massAccCutoff.grid(row=3, column=1, sticky=W)
-        self.SNLabel = Label(top, text="Enter the minimum signal-to-nose value")
-        self.SNLabel.grid(row=4, column=0, sticky=W)
-        self.SNCutoff = Entry(top)
+        self.massAccCutoff.grid(row=3, column=1, sticky=tk.W)
+        self.SNLabel = tk.Label(top, text="Enter the minimum signal-to-nose value")
+        self.SNLabel.grid(row=4, column=0, sticky=tk.W)
+        self.SNCutoff = tk.Entry(top)
         self.SNCutoff.insert(0,9)
-        self.SNCutoff.grid(row=4, column=1, sticky=W)
-        self.IPQLabel = Label(top, text="Enter the maximum deviation of the theoretical isotopic pattern")
-        self.IPQLabel.grid(row=5, column=0, sticky=W)
-        self.IPQCutoff = Entry(top)
+        self.SNCutoff.grid(row=4, column=1, sticky=tk.W)
+        self.IPQLabel = tk.Label(top, text="Enter the maximum deviation of the theoretical isotopic pattern")
+        self.IPQLabel.grid(row=5, column=0, sticky=tk.W)
+        self.IPQCutoff = tk.Entry(top)
         self.IPQCutoff.insert(0,0.25)
-        self.IPQCutoff.grid(row=5, column=1, sticky=W)
-        self.update = Button(top, text="Curate", width=25, command=lambda: performCuration())
-        self.update.grid(row=6, column=0, sticky=W)
+        self.IPQCutoff.grid(row=5, column=1, sticky=tk.W)
+        self.update = tk.Button(top, text="Curate", width=25, command=lambda: performCuration())
+        self.update.grid(row=6, column=0, sticky=tk.W)
         return
 
     def batchProcess(self, master):
@@ -1071,37 +1071,32 @@ class App():
         """
         # Safety feature (prevents batchProcess from being started multiple times)
         if self.batchProcessing == 1:
-            # Destroy progress bar
-            try:
-                barWindow.destroy()
-            except:
-                pass
-            tkMessageBox.showinfo("Error Message", "Batch Process already running")
+            messagebox.showinfo("Error Message", "Batch Process already running")
             return
         self.batchProcessing = 1
         #####################
         # PROGRESS BAR CODE #
         #####################
-        self.calPerc = StringVar()
-        self.extPerc = StringVar()
+        self.calPerc = tk.StringVar()
+        self.extPerc = tk.StringVar()
         self.calPerc.set("0%")
         self.extPerc.set("0%")
         # barWindow = Tk()
-        barWindow = self.top = Toplevel()
+        barWindow = self.top = tk.Toplevel()
         barWindow.title("Progress Bar")
-        cal = Label(barWindow, text="Calibration", padx=25)
+        cal = tk.Label(barWindow, text="Calibration", padx=25)
         cal.grid(row=0, column=0, sticky="W")
         ft = ttk.Frame(barWindow)
         ft.grid(row=1, columnspan=2, sticky="")
-        perc1 = Label(barWindow, textvariable=self.calPerc)
+        perc1 = tk.Label(barWindow, textvariable=self.calPerc)
         perc1.grid(row=0, column=1, padx=25)
         progressbar = ttk.Progressbar(ft, length=100, mode='determinate')
         progressbar.grid(row=1, columnspan=2, sticky="")
-        ext = Label(barWindow, text="Extraction", padx=25)
+        ext = tk.Label(barWindow, text="Extraction", padx=25)
         ext.grid(row=2, column=0, sticky="W")
         ft2 = ttk.Frame(barWindow)
         ft2.grid(row=3, columnspan=2, sticky="")
-        perc2 = Label(barWindow, textvariable=self.extPerc)
+        perc2 = tk.Label(barWindow, textvariable=self.extPerc)
         perc2.grid(row=2, column=1, padx=25)
         progressbar2 = ttk.Progressbar(ft2, length=100, mode='determinate')
         progressbar2.grid(row=3, columnspan=2, sticky="")
@@ -1110,7 +1105,7 @@ class App():
         ###################
         results, filesGrabbed = ([] for i in range(2))
         if self.calibrationFile == "" and self.compositionFile == "":
-            tkMessageBox.showinfo("File Error", "No calibration or composition file selected")
+            messagebox.showinfo("File Error", "No calibration or composition file selected")
             # Clear the batchProcess lock
             self.batchProcessing = 0
             return
@@ -1127,7 +1122,7 @@ class App():
                     filesGrabbed.append(file)
         for index, file in enumerate(filesGrabbed):
             self.inputFile = file
-            if self.calibrationFile != "":
+            if self.calibrationFile != "":  # and self.exclusionFile != "":
                 # Update the calibration progress bar
                 self.calPerc.set(str(int( (float(index) / float(len(filesGrabbed) ) ) *100))+"%")
                 # print "CalPerc is now set to: "+str(self.calPerc.get())
@@ -1178,7 +1173,7 @@ class App():
         self.batchProcessing = 0
         # Destroy progress bar
         barWindow.destroy()
-        tkMessageBox.showinfo("Status Message", "Batch Process finished on "+str(datetime.now()))
+        messagebox.showinfo("Status Message", "Batch Process finished on "+str(datetime.now()))
 
     def checkMaximaSpacing(self, maxima, data):
         """ This function ensures that the observed local maxima
@@ -1327,7 +1322,7 @@ class App():
         sulfurs36 = self.calcDistribution(S36, numSulfurs)
         return ((mass, carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36))
 
-    def getChanceNetwork(self, (mass, carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36)):
+    def getChanceNetwork(self, values):
         """ This function calculates the total chance network based on
         all the individual distributions. The function multiplies all
         the chances to get a single chance for a single option.
@@ -1336,6 +1331,7 @@ class App():
                other lists (1 for each isotopic state).
         OUTPUT: A list of float tuples (isotopic m/z, isotopic chance)
         """
+        (mass, carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36) = values
         totals = []
         for x in itertools.product(carbons, hydrogens, nitrogens, oxygens17, oxygens18, sulfurs33, sulfurs34, sulfurs36):
             i, j, k, l, m, n, o, p = x
@@ -1389,7 +1385,7 @@ class App():
         OUTPUT: None
         """
         if self.calibrationFile == "":
-            tkMessageBox.showinfo("File Error", "No calibration file selected")
+            messagebox.showinfo("File Error", "No calibration file selected")
             return
         maximaMZ = []
         #window = self.calibrationMenu()
@@ -1463,12 +1459,12 @@ class App():
         INPUT: A list of (expected m/z, observed m/z, ppm error) tuples
         OUTPUT: None
         """
-        root2 = Toplevel()
+        root2 = tk.Toplevel()
         fig2 = plt.Figure()
         canvas2 = FigureCanvasTkAgg(fig2, master=root2)
-        toolbar2 = NavigationToolbar2TkAgg(canvas2, root2)
-        canvas2.show()
-        canvas2.get_tk_widget().pack(fill=BOTH, expand=YES)
+        toolbar2 = NavigationToolbar2Tk(canvas2, root2)
+        canvas2.draw()
+        canvas2.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         x_array = []
         y_array = []
         labels = []
@@ -1561,7 +1557,6 @@ class App():
                 mix = totals[j]+totals[j+1]+totals[j+2]+totals[j+3]+totals[j+4]
                 dev = numpy.std(mix)
                 avg = numpy.average(mix)
-                temp = []
                 if avg < backgroundValue:
                     backgroundValue = avg
                     if self.noise == "RMS":
@@ -1576,7 +1571,7 @@ class App():
                                 minNoise = k
                         noise = maxNoise - minNoise
                     else:
-                        tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
+                        messagebox.showinfo("Noise Error", "No valid noise method selected")
                         return
             x_points = []
             y_points = []
@@ -1650,7 +1645,7 @@ class App():
         """
         actualCalibrants = []
         for i in maxima:
-            diff = sys.maxint
+            diff = sys.float_info.max
             closest = 0
             for j in potentialCalibrants:
                 if abs(float(j)-float(i[0])) < diff:
@@ -1679,7 +1674,7 @@ class App():
             for line in fr:
                 line = line.rstrip('\n')
                 values = line.split()
-                values = filter(None,  values)
+                values = list(filter(None,  values))
                 excluded.append((values[0], values[1]))
         # Transform the excluded regions into included regions
         for index, i in enumerate(excluded):
@@ -1704,7 +1699,7 @@ class App():
                 else:
                     line = line.rstrip('\n')
                     line = line.split('\t')
-                    line = filter(None, line)
+                    line = list(filter(None, line))
                     if len(line) >= 2:
                         potentialCalibrants.append(float(line[1]))
                     elif len(line) == 1:
@@ -1750,21 +1745,21 @@ class App():
         OUTPUT: None
         """
         if self.qualityFile == "":
-            tkMessageBox.showinfo("File Error", "No QC file selected")
+            messagebox.showinfo("File Error", "No QC file selected")
             return
         if self.inputFile == "":
-            tkMessageBox.showinfo("File Error", "No data file selected")
+            messagebox.showinfo("File Error", "No data file selected")
             return
         peaks = self.calcCompositionMasses(self.qualityFile)
         peaks = self.extractData(self.inputFile, peaks)
         peaks = self.qualityControl(peaks)
         # TODO: How should we display this?
-    
+
     def spectralCuration(self,master):
         """ TODO
         """
-        self.sumFile = StringVar()
-        self.testVariable = StringVar()
+        self.sumFile = tk.StringVar()
+        self.testVariable = tk.StringVar()
         self.data = []
 
         def close(self):
@@ -1831,23 +1826,23 @@ class App():
                     fw.write("\n")
             top.destroy()
 
-        top = self.top = Toplevel()
+        top = self.top = tk.Toplevel()
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
-        self.sumButtonLabel = Label(top, text="Please select the summary file to be curated")
-        self.sumButtonLabel.grid(row=0, column=0, sticky=W)
-        self.sumButton = Button(top, text="Summary File", width=25, command=lambda: summaryButton())
-        self.sumButton.grid(row=0, column=1, sticky=W)
-        self.dataLabel = Label(top, text="Data to be used for curation")
-        self.dataLabel.grid(row=1, column=0, sticky=W)
-        self.dataButton = OptionMenu(top, self.testVariable, "Select a summary file first")
-        self.dataButton.grid(row=1, column=1, sticky=W)
-        self.SDLabel = Label(top, text="Enter the number of SD for outlier removal")
-        self.SDLabel.grid(row=2, column=0, sticky=W)
-        self.SDCutoff = Entry(top)
+        self.sumButtonLabel = tk.Label(top, text="Please select the summary file to be curated")
+        self.sumButtonLabel.grid(row=0, column=0, sticky=tk.W)
+        self.sumButton = tk.Button(top, text="Summary File", width=25, command=lambda: summaryButton())
+        self.sumButton.grid(row=0, column=1, sticky=tk.W)
+        self.dataLabel = tk.Label(top, text="Data to be used for curation")
+        self.dataLabel.grid(row=1, column=0, sticky=tk.W)
+        self.dataButton = tk.OptionMenu(top, self.testVariable, "Select a summary file first")
+        self.dataButton.grid(row=1, column=1, sticky=tk.W)
+        self.SDLabel = tk.Label(top, text="Enter the number of SD for outlier removal")
+        self.SDLabel.grid(row=2, column=0, sticky=tk.W)
+        self.SDCutoff = tk.Entry(top)
         self.SDCutoff.insert(0,5)
-        self.SDCutoff.grid(row=2, column=1, sticky=W)
-        self.update = Button(top, text="Curate", width=25, command=lambda: performCuration())
-        self.update.grid(row=3, column=0, sticky=W)
+        self.SDCutoff.grid(row=2, column=1, sticky=tk.W)
+        self.update = tk.Button(top, text="Curate", width=25, command=lambda: performCuration())
+        self.update.grid(row=3, column=0, sticky=tk.W)
         return
 
 
@@ -1865,7 +1860,7 @@ class App():
         """
         for i in compositions:
             if self.batchProcessing == 0:
-                print "Analyte: "+str(i.composition)
+                print ("Analyte: "+str(i.composition))
             total = 0
             totalExp = 0
             for j in i.isotopes[1:]:
@@ -1884,7 +1879,7 @@ class App():
                     j.qc = abs((float(maxAreaBackCorrected) / float(total)) - (j.expArea/totalExp))
                 # Temporary display
                 if self.batchProcessing == 0:
-                    print "Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc)
+                    print ("Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc))
         return compositions
 
     def extractCompositions(self):
@@ -1900,17 +1895,17 @@ class App():
 
         INPUT: None
         OUTPUT: None
-        
+
         TODO: This function does not calculate QC values for now
         """
         if self.compositionFile == "":
-            tkMessageBox.showinfo("File Error", "No composition file selected")
+            messagebox.showinfo("File Error", "No composition file selected")
             return
         if self.inputFile == "":
-            tkMessageBox.showinfo("File Error", "No data file selected")
+            messagebox.showinfo("File Error", "No data file selected")
             return
         self.initCompositionMasses(self.compositionFile)
-        compositions = self.calcCompositionMasses(os.path.join(self.batchFolder, "analytes.ref"))
+        compositions = self.calcCompositionMasses(self.compositionFile)
         compositions = self.extractData(self.inputFile, compositions)
         self.writeResults(compositions)
 
@@ -1951,7 +1946,7 @@ class App():
                 for i in lines:
                     isotopes = []
                     i = i.split("\t")
-                    i = filter(None, i)
+                    i = list(filter(None, i))
                     if len(i) == 2:
                         window = float(i[1])
                     else:
@@ -1998,7 +1993,7 @@ class App():
         for i in lines:
             isotopes = []
             i = i.split("\t")
-            i = filter(None, i)
+            i = list(filter(None, i))
             isoMasses = i[2::2]
             isoFractions = i[3::2]
             window = float(i[1])
@@ -2156,7 +2151,7 @@ class App():
         INPUT 2: A list of Analyte instances
         OUTPUT: A tuple of (Background, Background Area, Noise)
         """
-        backgroundPoint = sys.maxint
+        backgroundPoint = sys.float_info.max
         totals = []
         lowEdge = mass - window
         highEdge = mass + window
@@ -2167,8 +2162,8 @@ class App():
             begin = self.search_right(data, lowEdge-i*C[0][2], len(data))
             end = self.search_left(data, highEdge-i*C[0][2], len(data))
             if begin is None or end is None:
-                print "Specified m/z value of " + str(lowEdge) + " or " + str(highEdge) + " outside of spectra range"
-                raw_input("Press enter to exit")
+                print ("Specified m/z value of " + str(lowEdge) + " or " + str(highEdge) + " outside of spectra range")
+                input("Press enter to exit")
                 sys.exit()
             for j in data[begin:end]:
                 # Approximate the area by multiplying intensity * m/z width
@@ -2191,7 +2186,7 @@ class App():
                     elif self.noise == "MM":
                         noise = max(mix) - min(mix)
                     else:
-                        tkMessageBox.showinfo("Noise Error", "No valid noise method selected")
+                        messagebox.showinfo("Noise Error", "No valid noise method selected")
                         return
         # Find the set of 5 consecutive windows with median average intensity
         elif self.background == "MEDIAN":
@@ -2278,11 +2273,11 @@ class App():
         """
         maxIsotope = 0
         if self.batchProcessing == 0:
-            outFile = tkFileDialog.asksaveasfilename()
+            outFile = filedialog.asksaveasfilename()
             if outFile:
                 pass
             else:
-                tkMessageBox.showinfo("File Error", "No output file selected")
+                messagebox.showinfo("File Error", "No output file selected")
                 return
         else:
             outFile = os.path.split(str(self.inputFile))[-1]
@@ -2373,7 +2368,7 @@ class App():
                     # Sum all isotope - background values
                     # Get all values for isotope 0 and up
                     isotopes = i[11::3]
-                    sections = [i[x:x+3] for x in xrange(11, len(i), 3)]
+                    sections = [i[x:x+3] for x in range(11, len(i), 3)]
                     for j in sections:
                         try:
                             float(j[0])
@@ -2983,7 +2978,7 @@ class App():
             data = xy.parseXY(file,self.log)
             return data
         else:
-            tkMessageBox.showinfo("File Error", "Incorrect file format")
+            messagebox.showinfo("File Error", "Incorrect file format")
 
     def selectIsotopes(self, results):
         """ TODO
@@ -3074,7 +3069,7 @@ class App():
         INPUT 2: A integer indicating the desired variable
         OUTPUT: None
         """
-        name = tkFileDialog.askopenfilename()
+        name = filedialog.askopenfilename()
         ops = {
             1: 'deglycoData',
             2: 'peptideFile',
@@ -3107,6 +3102,6 @@ class App():
 
 # Call the main app
 if __name__ == "__main__":
-    root = Tk()
+    root = tk.Tk()
     app = App(root)
     root.mainloop()
