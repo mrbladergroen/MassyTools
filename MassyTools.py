@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 #
 # Copyright 2014-2017 Bas C. Jansen
 #
@@ -251,7 +251,7 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "1.0.2"
+        self.version = "1.0.2_python3"
         self.build = "190321a"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
