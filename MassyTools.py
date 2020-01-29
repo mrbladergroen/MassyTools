@@ -211,7 +211,7 @@ class ToolTip(object):
         self.text = text
         if self.tipwindow or not self.text:
             return
-        x, y, cx, cy = self.widget.bbox("insert")
+        x, y, _, cy = self.widget.bbox("insert")
         x = x + self.widget.winfo_rootx() + 27
         y = y + cy + self.widget.winfo_rooty() +27
         self.tipwindow = tw = tk.Toplevel(self.widget)
@@ -252,7 +252,7 @@ class App():
     def __init__(self, master):
         # VARIABLES
         self.version = "1.0.2_python3"
-        self.build = "190321a"
+        self.build = "200129a"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
         self.relativeIntensity = tk.IntVar()
@@ -300,7 +300,7 @@ class App():
         self.canvas.draw()
 
         # FRAME
-        frame = tk.Frame(master)
+        tk.Frame(master)
         master.title("MassyTools "+str(self.version))
 #       if os.path.isfile('./ui/Icon.ico'):
 #           master.iconbitmap(default='./ui/Icon.ico')
@@ -401,6 +401,7 @@ class App():
 
         master.measurementWindow = 1
         top = self.top = tk.Toplevel()
+        top.grab_set()
         top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
         self.calibrationLabel = tk.Label(top, text="Calibration parameters", font="bold")
         self.calibrationLabel.grid(row=1, columnspan=2, sticky=tk.W)
@@ -610,9 +611,11 @@ class App():
         self.output.grid(row=6, column=0, columnspan=2)
         self.run = tk.Button(top, text="Run Batch Process", width=25, command=lambda: run())
         self.run.grid(row=7, column=0, columnspan=2)
+        # Make dialog window modal 
+        top.grab_set()
         # top.lift()
         # Couple the attributes to button presses
-        top.attributes("-topmost", True)
+        #top.attributes("-topmost", True)
 
     def measurementPopup(self,master):
         """ This function creates a pop up box to specify how the analytes
@@ -628,14 +631,18 @@ class App():
 
         def onselect1(evt):
             w = evt.widget
-            index = int(w.curselection()[0])
+            c=w.curselection()
+            print(c)
+            index = int(c[0])
             value = w.get(index)
             master.selected.insert(tk.END,value)
             master.avail.delete(index)
 
         def onselect2(evt):
             w = evt.widget
-            index = int(w.curselection()[0])
+            c=w.curselection()
+            print(c)
+            index = int(c[0])
             value = w.get(index)
             master.selected.delete(index)
             master.avail.insert(tk.END,value)
@@ -691,6 +698,7 @@ class App():
         master.measurementWindow = 1
         top = self.top = tk.Toplevel()
         top.protocol( "WM_DELETE_WINDOW", lambda: close(self))
+        top.grab_set()
         self.charge = tk.Label(top, text = "Charge", width = 10)
         self.charge.grid(row = 0, column = 0, sticky=tk.W)
         self.min = tk.Label(top, text = "Min", width = 5)
@@ -768,6 +776,7 @@ class App():
 
         top = self.top = tk.Toplevel()
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
+        top.grab_set()
         self.all = tk.Button(top, text="Select All", command=lambda: select_all(self))
         self.all.grid(row=0, column=0, sticky=tk.W)
         self.none = tk.Button(top, text="Select None", command=lambda: select_none(self))
@@ -922,9 +931,6 @@ class App():
         def close(self):
             top.destroy()
 
-        def refreshButton():
-            print (self.testVariable.get())
-
         def initSummary(sumFile):
             chunk = []
             with open(sumFile,'r') as fr:
@@ -1000,7 +1006,7 @@ class App():
                             renorm = False
                             if "relative" in i[0][0].lower():
                                 renorm = True
-                            for index1, j in enumerate(i):
+                            for _, j in enumerate(i):
                                 total = 0.
                                 if renorm == True:
                                     for index2, k in enumerate(j):
@@ -1103,7 +1109,7 @@ class App():
         ###################
         # END OF BAR CODE #
         ###################
-        results, filesGrabbed = ([] for i in range(2))
+        _, filesGrabbed = ([] for i in range(2))
         if self.calibrationFile == "" and self.compositionFile == "":
             messagebox.showinfo("File Error", "No calibration or composition file selected")
             # Clear the batchProcess lock
@@ -1266,7 +1272,6 @@ class App():
         OUTPUT: A list containing the Analyte m/z followed by several
                 other lists (1 for each isotopic state).
         """
-        results = []
         mass = 0
         numCarbons = 0
         numHydrogens = 0
@@ -1274,7 +1279,6 @@ class App():
         numOxygens = 0
         numSulfurs = 0
         numSialic = 0
-        totalElements = 0
         numUnits = 0
         units = ["".join(x) for _, x in itertools.groupby(Analyte, key=str.isalpha)]
         # Calculate the bass composition values
@@ -1463,7 +1467,7 @@ class App():
         root2 = tk.Toplevel()
         fig2 = plt.Figure()
         canvas2 = FigureCanvasTkAgg(fig2, master=root2)
-        toolbar2 = NavigationToolbar2Tk(canvas2, root2)
+        NavigationToolbar2Tk(canvas2, root2)
         canvas2.draw()
         canvas2.get_tk_widget().pack(fill=tk.BOTH, expand=tk.YES)
         x_array = []
@@ -1678,7 +1682,7 @@ class App():
                 values = list(filter(None,  values))
                 excluded.append((values[0], values[1]))
         # Transform the excluded regions into included regions
-        for index, i in enumerate(excluded):
+        for index, _ in enumerate(excluded):
             if index+1 < len(excluded):
                 included.append((float(excluded[index][1]), float(excluded[index+1][0])))
         return included
@@ -1923,7 +1927,6 @@ class App():
         OUTPUT: None
         """
         lines = []
-        compositions = []
         with open(file, 'r') as fr:
             for line in fr:
                 line = line.rstrip()
@@ -1945,7 +1948,6 @@ class App():
         if self.overWrite.get() == 1:
             with open(analyteFile, 'w') as fw:
                 for i in lines:
-                    isotopes = []
                     i = i.split("\t")
                     i = list(filter(None, i))
                     if len(i) == 2:
@@ -1959,7 +1961,7 @@ class App():
                     results.sort(key=lambda x: x[0])
                     fw.write(str(i[0])+"\t"+str(window))
                     fTotal = 0
-                    for index, j in enumerate(results):
+                    for _, j in enumerate(results):
                         fTotal += j[1]
                         fw.write("\t"+str(j[0])+"\t"+str(j[1]))
                         if fTotal >= MIN_TOTAL_CONTRIBUTION:
@@ -2027,7 +2029,6 @@ class App():
             for line in fr:
                 mass = 0
                 area = 0
-                isotopes = []
                 line = line.split("\t")
                 analyte = line[0]
                 window = line[1]
@@ -2057,7 +2058,7 @@ class App():
         outFile = outFile.split(".")[0]
         outFile = outFile+".errorAll"
         with open(outFile, 'w') as fw:
-            fw.write("Expected m/z\tObserved m\z\tPPM Error\n")
+            fw.write("Expected m/z\tObserved m/z\tPPM Error\n")
             for index, i in enumerate(errors):
                 fw.write(str(i[0])+"\t"+str(i[1])+"\t"+str(i[2])+"\n")
 
@@ -2110,7 +2111,7 @@ class App():
                                 i.ppm = ((accurateMass - j.mass) / j.mass) * 1000000
                                 # Calculate S/N
                                 i.sn = (max(y_points) - i.backgroundPoint) / i.noise
-                            except Exception as e:
+                            except Exception:
                                 print ("Skipping SN and PPM calculation for "+str(i.composition))
                                 i.ppm = None
                                 i.sn = None
@@ -2162,7 +2163,6 @@ class App():
         for i in range(-OUTER_BCK_BORDER, OUTER_BCK_BORDER):
             windowAreas = []
             windowIntensities = []
-            mzValues = []
             begin = self.search_right(data, lowEdge-i*C[0][2], len(data))
             end = self.search_left(data, highEdge-i*C[0][2], len(data))
             if begin is None or end is None:
@@ -2206,7 +2206,7 @@ class App():
                     noise = max(mix) - min(mix)
                 values.append((avg, avgBackground, noise))
             sortedValues = sorted(values, key=lambda x: x[0])
-            a, b, c = zip(*sortedValues)
+            a, b, c = list(zip(*sortedValues))
             backgroundPoint = a[len(a)//2]
             backgroundArea = b[len(b)//2]
             noise = c[len(c)//2]
@@ -2322,7 +2322,6 @@ class App():
         OUTOUT: A file -> summary.txt"
         """
         numIsotopes = 0
-        counter = 0
         data = []
 
         # Construct the 'Mass' header
