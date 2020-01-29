@@ -1394,7 +1394,8 @@ class App():
             included = self.readInclusionRange()
         else:
             included = self.createInclusionList(potentialCalibrants)
-        data = self.readData(self.inputFile)
+        zdata = self.readData(self.inputFile)
+        data = list(zdata)
         maxima = self.getLocalMaxima(data, included)
         actualCalibrants = self.getObservedCalibrants(maxima, potentialCalibrants)
         if self.checkMaximaSpacing(actualCalibrants, data) is False:
@@ -1592,7 +1593,7 @@ class App():
                 # We multiply the number of bins with the actual window (to not    #
                 # have major changes in returned maxima with different windows)    #
                 ####################################################################
-                newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
+                newX = numpy.linspace(x_points[0], x_points[-1], int(2500*(x_points[-1]-x_points[0])))
                 f = InterpolatedUnivariateSpline(x_points, y_points)
                 ySPLINE = f(newX)
                 ###############################################
@@ -1983,7 +1984,8 @@ class App():
         """
         lines = []
         compositions = []
-        data = self.readData(self.inputFile)
+        zdata = self.readData(self.inputFile)
+        data = list(zdata)
         analyteFile = file
         with open(analyteFile, 'r') as fr:
             for line in fr:
@@ -2037,7 +2039,8 @@ class App():
                         mass = masses[index]
                 analytes.append((analyte, mass, window, area))
         # Get the accurate mass of highest isotope
-        data = self.readData(self.inputFile)
+        zdata = self.readData(self.inputFile)
+        data= list(zdata)
         inclusion = []
         exactMasses = []
         for i in analytes:
@@ -2071,7 +2074,8 @@ class App():
         INPUT 2: A list of Analyte instances
         OUTPUT: A list of Analyte instances
         """
-        data = self.readData(self.inputFile)
+        zdata = self.readData(self.inputFile)
+        data = list(zdata)
         for i in compositions:
             # This is a 'heavy' calculation, only perform it if the user wanted it
             if self.aQC.get() == 1:
@@ -2094,7 +2098,7 @@ class App():
                                 for k in data[begin:end]:
                                     x_points.append(k[0])
                                     y_points.append(k[1])
-                                newX = numpy.linspace(x_points[0], x_points[-1], 2500*(x_points[-1]-x_points[0]))
+                                newX = numpy.linspace(x_points[0], x_points[-1], int(2500*(x_points[-1]-x_points[0])))
                                 f = InterpolatedUnivariateSpline(x_points, y_points)
                                 ySpline = f(newX)
                                 maximum = 0
@@ -2921,7 +2925,7 @@ class App():
         beyond the final datapoint, ie Numpy arrays).
         OUTPUT: An integer listing the array index
         """
-        if target >= array[0][0] and target <= array[high-1][0]:
+        if len(array) > 0 and target >= array[0][0] and target <= array[high-1][0]:
             a = 0
             b = high-1
             while a < b:
@@ -2950,7 +2954,7 @@ class App():
         OUTPUT: An integer listing the array index
         """
 
-        if target >= array[0][0] and target <= array[high-1][0]:
+        if len(array) > 0 and target >= array[0][0] and target <= array[high-1][0]:
             a = 0
             b = high-1
             while a < b:
@@ -3089,7 +3093,8 @@ class App():
         OUTPUT: A float containing the total area for a spectrum.
         """
         intensity = 0
-        data = self.readData(file)
+        zdata = self.readData(file)
+        data = list(zdata)
         for i in range(0, len(data)):
             try:
                 intensity += float(data[i][1]) * (float(data[i+1][0]) - float(data[i][0]))
