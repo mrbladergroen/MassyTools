@@ -35,6 +35,8 @@ import tkinter.ttk as ttk
 
 # Custom libraries
 #sys.path.append('libs')
+#mydir = os.path.realpath(__file__)
+#sys.path.append(mydir)
 import libs.mzML as mzML
 import libs.xy as xy
 import libs.varnames as varnames
@@ -586,31 +588,32 @@ class App():
             master.batchProcess(master)
 
         top = self.top = tk.Toplevel()
+        #top.minsize(1024,-1)
         top.protocol("WM_DELETE_WINDOW", lambda: close(self))
         self.calib = tk.Button(top, text="Calibration File", width=25, command=lambda: calibrationButton())
         self.calib.grid(row=0, column=0, sticky=tk.W)
-        self.cal = tk.Label(top, textvariable=self.calFile, width=25)
+        self.cal = tk.Label(top, textvariable=self.calFile)
         self.cal.grid(row=0, column=1, padx=25)
         self.exclus = tk.Button(top, text="Exclusion File", width=25, command=lambda: exclusionButton())
         self.exclus.grid(row=1, column=0, sticky=tk.W)
-        self.exc = tk.Label(top, textvariable=self.exclFile, width=25)
+        self.exc = tk.Label(top, textvariable=self.exclFile)
         self.exc.grid(row=1, column=1)
         self.compos = tk.Button(top, text="Composition File", width=25, command=lambda: compositionButton())
         self.compos.grid(row=2, column=0, sticky=tk.W)
-        self.com = tk.Label(top, textvariable=self.compFile, width=25)
+        self.com = tk.Label(top, textvariable=self.compFile)
         self.com.grid(row=2, column=1)
         self.overwrite = tk.Checkbutton(top, text = "Overwrite Analyte File", variable = master.overWrite, onvalue = 1, offvalue = 0)
         self.overwrite.grid(row = 3, column = 0, sticky=tk.W)
         self.batchDir = tk.Button(top, text="Batch Directory", width=25, command=lambda: batchButton())
         self.batchDir.grid(row=4, column=0, sticky=tk.W)
-        self.batch = tk.Label(top, textvariable=self.folder, width=25)
+        self.batch = tk.Label(top, textvariable=self.folder)
         self.batch.grid(row=4, column=1)
         self.measurement = tk.Button(top, text="Measurement Setup", width=25, command=lambda: master.measurementPopup(master))
-        self.measurement.grid(row=5, column=0,columnspan=2)
+        self.measurement.grid(row=5, column=0, sticky=tk.W)
         self.output = tk.Button(top, text="Output Format", width=25, command=lambda: master.outputPopup(master))
-        self.output.grid(row=6, column=0, columnspan=2)
+        self.output.grid(row=6, column=0, sticky=tk.W)
         self.run = tk.Button(top, text="Run Batch Process", width=25, command=lambda: run())
-        self.run.grid(row=7, column=0, columnspan=2)
+        self.run.grid(row=7, column=0, sticky=tk.W)
         # Make dialog window modal 
         top.grab_set()
         # top.lift()
