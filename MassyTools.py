@@ -253,8 +253,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "1.0.2_python3"
-        self.build = "200129a"
+        self.version = "2.0.0"
+        self.build = "20210209"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
         self.relativeIntensity = tk.IntVar()
