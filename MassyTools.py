@@ -18,9 +18,7 @@
 from datetime import datetime
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from scipy.interpolate import InterpolatedUnivariateSpline
-#from scipy.optimize import fmin
 import tkinter as tk
-#import fileinput
 import glob
 import itertools
 import math
@@ -1887,7 +1885,6 @@ class App():
                     j.qc = abs((float(maxAreaBackCorrected) / float(total)) - (j.expArea/totalExp))
                 # Temporary display
                 if self.batchProcessing == 0:
-#                    print ("Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % f)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc))
                     print ("Isotope: "+str(j.isotope)+"\tExpected: "+str("%.2f" % totalExp)+"\tObserved: "+str("%.2f" % ((j.maxIntensity - i.backgroundPoint)/total))+"\tQC Score: "+str("%.2f" % j.qc))
         return compositions
 
@@ -2396,12 +2393,10 @@ class App():
             total = 0
             values = []
             calibrated = 0
-            #ppm = "NA"
             name = str(file)
             name = os.path.split(str(name))[-1]
             if 'uncalibrated' in name:
                 name = name.split("uncalibrated_")[1]
-#                name = name.split(".")[0] # This line is disabled, so that the uncalibrated files also get the extension in the name
                 data.append(Results(name, calibrated, total, total, total, values))
 
         ################################################################
