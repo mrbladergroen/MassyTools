@@ -56,7 +56,7 @@ CHARGE_CARRIER = ['sodium']                             # The Charge carrier of 
 CALCULATION_WINDOW = 0.49                               # Default range to sum around the calculated m/z
 OUTER_BCK_BORDER = 20                                   # Maximum range to search for background signal
 S_N_CUTOFF = 9                                          # Minimum signal to noise value of an analyte to be included in the percentage QC
-MIN_TOTAL_CONTRIBUTION = 0.95                           # Minimum total contribution of isotopes (of the total distribution) to be extracted
+MIN_TOTAL_CONTRIBUTION = 0.80                           # Minimum total contribution of isotopes (of the total distribution) to be extracted
 
 # Advanced Extraction Parameters (DO NOT CHANGE THESE UNLESS YOU KNOW WHAT YOU ARE DOING!!)
 MIN_CONTRIBUTION = 0.0001                               # Minimum contribution of an isotope to the total distribution to be included in the extraction
