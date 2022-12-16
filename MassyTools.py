@@ -53,7 +53,7 @@ SETTINGS_FILE = "Settings.txt"                          # Default name for the m
 # Extraction Parameters
 MASS_MODIFIERS = ['free']                               # Mass modifiers applied to all analytes (Default is addition of H2O)
 CHARGE_CARRIER = ['sodium']                             # The Charge carrier of an analyte (Default is addition of a proton)
-CALCULATION_WINDOW = 0.49                               # Default range to sum around the calculated m/z
+CALCULATION_WINDOW = "0.00003*mass-0.0269" #0.49        # Default range to sum around the calculated m/z; 
 OUTER_BCK_BORDER = 20                                   # Maximum range to search for background signal
 S_N_CUTOFF = 9                                          # Minimum signal to noise value of an analyte to be included in the percentage QC
 MIN_TOTAL_CONTRIBUTION = 0.80                           # Minimum total contribution of isotopes (of the total distribution) to be extracted
@@ -131,7 +131,7 @@ for k,v in BLOCKS.items():
         root = tk.Tk()
         root.withdraw()
         messagebox.showinfo("Block Error","An error was observed in block "+str(k)+
-            ". Please correct this block before running LaCyTools again.")
+            ". Please correct this block before running MassyTools again.")
         sys.exit()
 UNITS = BLOCKS.keys()
 
@@ -251,8 +251,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.0.2"
-        self.build = "20221208"
+        self.version = "2.1.0"
+        self.build = "20221216"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
         self.relativeIntensity = tk.IntVar()
@@ -372,7 +372,10 @@ class App():
             NUM_MID_RANGE = int(self.calibMinMid.get())
             NUM_HIGH_RANGE = int(self.calibMinHigh.get())
             NUM_TOTAL = int(self.calibMinTotal.get())
-            CALCULATION_WINDOW = float(self.extracMassWindow.get())
+            try:
+                CALCULATION_WINDOW = float(self.extracMassWindow.get())
+            except ValueError:
+                CALCULATION_WINDOW = str(self.extracMassWindow.get())
             OUTER_BCK_BORDER = int(self.extracBack.get())
             S_N_CUTOFF = int(self.extracQcSn.get())
             MIN_TOTAL_CONTRIBUTION = float(self.extracMinTotal.get())
@@ -394,7 +397,10 @@ class App():
                 fw.write("NUM_MID_RANGE\t"+str(int(self.calibMinMid.get()))+"\n")
                 fw.write("NUM_HIGH_RANGE\t"+str(int(self.calibMinHigh.get()))+"\n")
                 fw.write("NUM_TOTAL\t"+str(int(self.calibMinTotal.get()))+"\n")
-                fw.write("CALCULATION_WINDOW\t"+str(float(self.extracMassWindow.get()))+"\n")
+                try:
+                    fw.write("CALCULATION_WINDOW\t"+str(float(self.extracMassWindow.get()))+"\n")
+                except ValueError:
+                    fw.write("CALCULATION_WINDOW\t"+str(self.extracMassWindow.get())+"\n")
                 fw.write("OUTER_BCK_BORDER\t"+str(int(self.extracBack.get()))+"\n")
                 fw.write("S_N_CUTOFF\t"+str(int(self.extracQcSn.get()))+"\n")
                 fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(self.extracMinTotal.get()))+"\n")
@@ -462,15 +468,15 @@ class App():
         self.save = tk.Button(top, text = 'Save', command = lambda: save(self))
         self.save.grid(row = 13, column = 1, sticky=tk.E)
         # Tooltips
-        createToolTip(self.calibWindowLabel,"The mass window in Dalton around the specified exact m/z of a calibrant, that LaCyTools uses to determine the uncalibrated accurate mass.")
+        createToolTip(self.calibWindowLabel,"The mass window in Dalton around the specified exact m/z of a calibrant, that MassyTools uses to determine the uncalibrated accurate mass.")
         createToolTip(self.calibSnLabel,"The minimum S/N of a calibrant to be included in the calibration.")
         createToolTip(self.calibMinLowLabel,"The minimum number of calibrants in the low m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
         createToolTip(self.calibMinMidLabel,"The minimum number of calibrants in the mid m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
         createToolTip(self.calibMinHighLabel,"The minimum number of calibrants in the high m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
         createToolTip(self.calibMinTotalLabel,"The minimum number of calibrants in the whole m/z range that have a S/N higher than the minimum S/N for calibration to occur.")
-        createToolTip(self.extracMassWindowLabel,"The m/z window in Thompson around the specified exact m/z of a feature that LaCyTools will use for quantitation. For example, a value of 0.1 results in LaCyTools quantifying 999.9 to 1000.1 for a feature with an m/z value of 1000.")
-        createToolTip(self.extracMinTotalLabel,"The minimum fraction of the theoretical isotopic pattern that LaCyTools will use for quantitation. For example, a value of 0.95 means that LaCyTools will quantify isotopes until the sum of the quantified isotopes exceeds 0.95 of the total theoretcal isotopic pattern.")
-        createToolTip(self.extracBackLabel,"The mass window in Dalton that LaCyTools is allowed to look for the local background and noise for each analyte. For example, a value of 10 means that LaCyTools will look from 990 m/z to 1010 m/z for an analyte with an m/z of 1000.")
+        createToolTip(self.extracMassWindowLabel,"The m/z window in Thompson around the specified exact m/z of a feature that MassyTools will use for quantitation. For example, a value of 0.1 results in MassyTools quantifying 999.9 to 1000.1 for a feature with an m/z value of 1000. You can write a 'function' without spaces; Use the word 'mass' to indicate the m/z value")
+        createToolTip(self.extracMinTotalLabel,"The minimum fraction of the theoretical isotopic pattern that MassyTools will use for quantitation. For example, a value of 0.95 means that MassyTools will quantify isotopes until the sum of the quantified isotopes exceeds 0.95 of the total theoretcal isotopic pattern.")
+        createToolTip(self.extracBackLabel,"The mass window in Dalton that MassyTools is allowed to look for the local background and noise for each analyte. For example, a value of 10 means that MassyTools will look from 990 m/z to 1010 m/z for an analyte with an m/z of 1000.")
         createToolTip(self.extracQcSnLabel,"The minimal S/N that an analyte has to have to be included in the analyte QC, e.g. the fraction of analyte intensity above S/N X, where X is the value specified here.")
 
     def getSettings(self):
@@ -510,7 +516,10 @@ class App():
                     NUM_TOTAL = int(chunks[1])
                 if chunks[0] == "CALCULATION_WINDOW":
                     global CALCULATION_WINDOW
-                    CALCULATION_WINDOW = float(chunks[1])
+                    try:
+                        CALCULATION_WINDOW = float(chunks[1])
+                    except ValueError:
+                        CALCULATION_WINDOW = str(chunks[1])
                 if chunks[0] == "OUTER_BCK_BORDER":
                     global OUTER_BCK_BORDER
                     OUTER_BCK_BORDER = int(chunks[1])
@@ -1956,10 +1965,13 @@ class App():
                     else:
                         window = CALCULATION_WINDOW
                     values = self.parseAnalyte(i[0])
+                    mass = values[0]
                     totals = self.getChanceNetwork(values)
                     results = self.mergeChances(totals)
                     results = self.selectIsotopes(results)
                     results.sort(key=lambda x: x[0])
+                    if isinstance(window, str):
+                        window = eval(window)
                     fw.write(str(i[0])+"\t"+str(window))
                     fTotal = 0
                     for _, j in enumerate(results):
