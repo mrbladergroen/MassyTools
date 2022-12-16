@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# You should have received a coyp of the Apache 2.0 license along
+# You should have received a copy of the Apache 2.0 license along
 # with this program; if not, see 
 # http://www.apache.org/licenses/LICENSE-2.0
 
@@ -251,8 +251,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.0.1"
-        self.build = "20220503"
+        self.version = "2.0.2"
+        self.build = "20221208"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
         self.relativeIntensity = tk.IntVar()
