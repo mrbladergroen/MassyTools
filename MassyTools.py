@@ -1971,7 +1971,7 @@ class App():
                     results = self.selectIsotopes(results)
                     results.sort(key=lambda x: x[0])
                     if isinstance(window, str):
-                        window = eval(window)
+                        window = eval(window, {'__builtins__': None}, {'mass':mass, 'sqrt':math.sqrt, 'pow':math.pow})
                     fw.write(str(i[0])+"\t"+str(window))
                     fTotal = 0
                     for _, j in enumerate(results):
