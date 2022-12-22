@@ -824,7 +824,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                            title='Select Mass Spectrum file(s)',
+                            initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -845,7 +847,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                                    title='Select calibration file',
+                                    initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -859,7 +863,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                                    title='Select composition file',
+                                    initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -873,7 +879,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                                title='Select exclusion file',
+                                initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -887,7 +895,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                                title='Select summary file',
+                                initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -901,7 +911,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        file_path = filedialog.askopenfilename()
+        file_path = filedialog.askopenfilename(
+                                title='Select quantitation file',
+                                initialdir=os.getcwd())
         if not file_path:
             pass
         else:
@@ -915,7 +927,9 @@ class App():
         INPUT: None
         OUTPUT: None
         """
-        folder_path = filedialog.askdirectory()
+        folder_path = filedialog.askdirectory(
+                                title='Select batch directory',
+                                initialdir=os.getcwd())
         if not folder_path:
             pass
         else:
