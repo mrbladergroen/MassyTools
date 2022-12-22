@@ -3081,30 +3081,6 @@ class App():
         self.axes.get_xaxis().get_major_formatter().set_useOffset(False)
         self.canvas.draw()
 
-    #####################
-    # CONSTRUCTION AREA #
-    #####################
-    """ This section contains functions, prototypes and ideas that I
-    have had but that are currently not being used or not mature enough
-    to be used in the stable version of this program.
-    """
-
-    def openFiles(self, number):
-        """ This function assigns the input string to the variable that
-        is indicated by the input integer.
-
-        INPUT 1: A string containing a filepath
-        INPUT 2: A integer indicating the desired variable
-        OUTPUT: None
-        """
-        name = filedialog.askopenfilename()
-        ops = {
-            1: 'deglycoData',
-            2: 'peptideFile',
-            3: 'mzML'
-        }
-        setattr(self, ops[number], name)
-
     def getTotalArea(self, file):
         """ This function reads a spectrum by calling the readData
         function. The function then attempts to calculate the total area
@@ -3125,9 +3101,6 @@ class App():
             except IndexError:
                 intensity += float(data[i][1]) * (float(data[-1][0]) - float(data[-2][0]))
         return intensity
-    #####################
-    # CONSTRUCTION AREA #
-    #####################
 
 # Call the main app
 if __name__ == "__main__":
