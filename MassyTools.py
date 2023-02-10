@@ -251,7 +251,7 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.1.2"
+        self.version = "2.1.3"
         self.build = "20230210"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
@@ -1331,7 +1331,7 @@ class App():
                 continue
             else:
                 mass += float(BLOCKS[j]['mass'])
-                numCarbons += float(BLOCKS[j]['carbons'])
+                numCarbons += int(BLOCKS[j]['carbons'])
                 numHydrogens += int(BLOCKS[j]['hydrogens'])
                 numNitrogens += int(BLOCKS[j]['nitrogens'])
                 numOxygens += int(BLOCKS[j]['oxygens'])
@@ -1339,8 +1339,8 @@ class App():
         for j in totalMassModifiers:
             if str(j) == "Per":
                 numSites = numOxygens - (numUnits * 2 - 2) - 1 - (1 * numSialic)
-                numCarbons += float(BLOCKS[j]['carbons']) * numSites
-                numHydrogens += float(BLOCKS[j]['hydrogens']) * numSites * 2
+                numCarbons += int(BLOCKS[j]['carbons']) * numSites
+                numHydrogens += int(BLOCKS[j]['hydrogens']) * numSites * 2
                 mass += float(BLOCKS[j]['mass']) * numSites
         # Calculate the distribution for the given value
         carbons = self.calcDistribution(C, numCarbons)
