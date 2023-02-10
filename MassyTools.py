@@ -697,7 +697,10 @@ class App():
                 fw.write("NUM_MID_RANGE\t"+str(int(NUM_MID_RANGE))+"\n")
                 fw.write("NUM_HIGH_RANGE\t"+str(int(NUM_HIGH_RANGE))+"\n")
                 fw.write("NUM_TOTAL\t"+str(int(NUM_TOTAL))+"\n")
-                fw.write("CALCULATION_WINDOW\t"+str(float(CALCULATION_WINDOW))+"\n")
+                try:
+                    fw.write("CALCULATION_WINDOW\t"+str(float(CALCULATION_WINDOW))+"\n")
+                except ValueError:
+                    fw.write("CALCULATION_WINDOW\t"+str(CALCULATION_WINDOW)+"\n")
                 fw.write("OUTER_BCK_BORDER\t"+str(int(OUTER_BCK_BORDER))+"\n")
                 fw.write("S_N_CUTOFF\t"+str(int(S_N_CUTOFF))+"\n")
                 fw.write("MIN_TOTAL_CONTRIBUTION\t"+str(float(MIN_TOTAL_CONTRIBUTION))+"\n")
