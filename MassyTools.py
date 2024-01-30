@@ -251,8 +251,8 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.1.3"
-        self.build = "20230210"
+        self.version = "2.1.4"
+        self.build = "20240130"
         self.master = master
         self.absoluteIntensity = tk.IntVar()
         self.relativeIntensity = tk.IntVar()
@@ -1846,7 +1846,7 @@ class App():
                         except ValueError:
                             pass
                     break
-            utc_datetime = datetime.utcnow()
+            utc_datetime = datetime.now(datetime.timezone.utc)
             s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
             filename = s + "_" + os.path.split(str(self.sumFile.get()))[-1].split("_")[-1]
             with open(filename,'w') as fw:
@@ -2440,7 +2440,7 @@ class App():
 
         # Write the data structure to the output file
         # Maybe change batchFolder with outputFolder?
-        utc_datetime = datetime.utcnow()
+        utc_datetime = datetime.now(datetime.timezone.utc)
         s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
         filename = s + "_" + OUTPUT_FILE
         #summaryFile = os.path.join(self.batchFolder, filename)
