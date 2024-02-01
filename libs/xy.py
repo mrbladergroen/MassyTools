@@ -20,7 +20,12 @@ def parseXY(inputFile, log):
                 values = line.split()
                 values = list(filter(None, values))
                 x_array.append(float(values[0]))
-                y_array.append(int(float(values[1])))
+                try:
+                    int(values[1])
+                    y_array.append(int(float(values[1])))
+                except ValueError:
+                    y_array.append(float(values[1]))
+                    
         if min(y_array) < 0.0:
             if log is True:
                 with open('MassyTools.log', 'a') as fw:

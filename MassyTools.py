@@ -251,14 +251,14 @@ class App():
 
     def __init__(self, master):
         # VARIABLES
-        self.version = "2.1.4"
-        self.build = "20240130"
+        self.version = "2.1.5"
+        self.build = "20240201"
         self.master = master
-        self.absoluteIntensity = tk.IntVar()
-        self.relativeIntensity = tk.IntVar()
+        self.absoluteIntensity = tk.DoubleVar() #tk.IntVar()
+        self.relativeIntensity = tk.DoubleVar() #tk.IntVar()
         self.bckSub = tk.IntVar()
         self.valueIso = tk.IntVar()
-        self.bckNoise = tk.IntVar()
+        self.bckNoise = tk.DoubleVar() #tk.IntVar()
         self.riCor = tk.IntVar()
         self.sQC = tk.IntVar()
         self.aQC = tk.IntVar()
@@ -1570,9 +1570,9 @@ class App():
         """
         maxima = []
         for i in included:
-            backgroundValue = 1000000000
-            noise = 0
-            maximum = (0, 0)
+            backgroundValue = 1000000000.0
+            noise = 0.0
+            maximum = (0.0, 0.0)
             totals = []
             begin = self.search_right(data, i[0], len(data))
             end = self.search_left(data, i[1], len(data))
@@ -1846,7 +1846,7 @@ class App():
                         except ValueError:
                             pass
                     break
-            utc_datetime = datetime.now(datetime.timezone.utc)
+            utc_datetime = datetime.utcnow()
             s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
             filename = s + "_" + os.path.split(str(self.sumFile.get()))[-1].split("_")[-1]
             with open(filename,'w') as fw:
@@ -2440,7 +2440,7 @@ class App():
 
         # Write the data structure to the output file
         # Maybe change batchFolder with outputFolder?
-        utc_datetime = datetime.now(datetime.timezone.utc)
+        utc_datetime = datetime.utcnow()
         s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
         filename = s + "_" + OUTPUT_FILE
         #summaryFile = os.path.join(self.batchFolder, filename)
