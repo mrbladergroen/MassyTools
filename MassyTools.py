@@ -15,7 +15,7 @@
 # with this program; if not, see 
 # http://www.apache.org/licenses/LICENSE-2.0
 
-from datetime import datetime
+from datetime import datetime, timezone
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from scipy.interpolate import InterpolatedUnivariateSpline
 import tkinter as tk
@@ -1846,7 +1846,7 @@ class App():
                         except ValueError:
                             pass
                     break
-            utc_datetime = datetime.now(datetime.timezone.utc)
+            utc_datetime = datetime.now(timezone.utc)
             s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
             filename = s + "_" + os.path.split(str(self.sumFile.get()))[-1].split("_")[-1]
             with open(filename,'w') as fw:
@@ -2440,7 +2440,7 @@ class App():
 
         # Write the data structure to the output file
         # Maybe change batchFolder with outputFolder?
-        utc_datetime = datetime.now(datetime.timezone.utc)
+        utc_datetime = datetime.now(timezone.utc)
         s = utc_datetime.strftime("%Y-%m-%d-%H%MZ")
         filename = s + "_" + OUTPUT_FILE
         #summaryFile = os.path.join(self.batchFolder, filename)
